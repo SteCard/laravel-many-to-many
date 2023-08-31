@@ -64,17 +64,17 @@ class ProjectController extends Controller
             $form_data['cover_image'] = $img_path;
         }
 
-        // GESTIONE RELAZIONE MANY-TO-MANY (PROJECTS, TECHNOLOGY)
-        if ($request->has('technologies')){
-
-            $project->technologies()->attach($request->technologies);
-        }
-
         $project = new Project();
 
         $project->fill($form_data);
 
         $project->save();
+
+        // GESTIONE RELAZIONE MANY-TO-MANY (PROJECTS, TECHNOLOGY)
+        if ($request->has('technologies')){
+
+            $project->technologies()->attach($request->technologies);
+        }
 
         return redirect()->route('admin.projects.show', $project);
     }
@@ -115,14 +115,14 @@ class ProjectController extends Controller
             $form_data['cover_image'] = $img_path;
         }
 
+        $project->update($form_data);
+
         // GESTIONE RELAZIONE MANY-TO-MANY (PROJECTS, TECHNOLOGY)
 
         if ($request->has('technologies')){
 
             $project->technologies()->sync($request->technologies);
         }        
-
-        $project->update($form_data);
 
         return redirect()->route('admin.projects.show', $project);
     }

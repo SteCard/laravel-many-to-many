@@ -53,6 +53,22 @@
                             <div class="text-danger">{{ $message }}</div>
                         @enderror
                     </div>
+                    
+                    <!-- Project Technologies Form Group -->
+                    <div class="form-group my-4">
+                        <span>Seleziona le Tecnologie</span>
+                        @foreach ($technologies as $technology)
+                            <div class="my-2">
+                                <input type="checkbox" name="technologies[]" value="{{ $technology->id }}" {{ in_array($technology->id, old('technologies', [])) ? 'checked' : ''}} class="form-check-input @error('technologies') is-invalid @enderror">
+                                <label class="form-check-label">{{ $technology->name }}</label>
+                            </div>
+                        @endforeach
+                        <!-- Technologies Error Text -->
+                        @error('technologies')
+                            <div class="text-danger">{{ $message }}</div>
+                        @enderror                        
+                    </div>
+
                     <div class="col-12 d-flex justify-content-center align-items-center my-5">
                         <button class="btn btn-success fw-bold px-5" type="submit">CREA</button>
                     </div>
