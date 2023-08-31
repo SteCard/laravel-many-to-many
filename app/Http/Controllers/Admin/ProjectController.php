@@ -4,10 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Project;
 use App\Models\Type;
+use App\Models\Technology;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreProjectRequest;
 use App\Http\Requests\UpdateProjectRequest;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class ProjectController extends Controller
@@ -42,8 +42,9 @@ class ProjectController extends Controller
     public function create()
     {
         $types = Type::all();
-        return view('admin.projects.create', compact('types'));
-    }
+        $technologies = Technology::all();
+
+        return view('admin.projects.create', compact('types', 'technologies'));    }
 
     /**
      * Store a newly created resource in storage.
@@ -55,11 +56,18 @@ class ProjectController extends Controller
     {
         $form_data = $request->all();
 
+        // GESTIONE UPLOAD DEI FILE (COVER_IMAGE)
         if($request->hasFile('cover_image')){
-
+                
             $img_path = Storage::put('projects_images', $request->cover_image);
-
+            
             $form_data['cover_image'] = $img_path;
+        }
+
+        // GESTIONE RELAZIONE MANY-TO-MANY (PROJECTS, TECHNOLOGY)
+        if ($request->has('technologies')){
+
+            $project->technologies()->attach($request->technologies);
         }
 
         $project = new Project();
@@ -80,8 +88,9 @@ class ProjectController extends Controller
     public function edit(Project $project)
     {
         $types = Type::all();
-        return view('admin.projects.edit', compact('project', 'types'));
-    }
+        $technologies = Technology::all();
+
+        return view('admin.projects.edit', compact('project', 'types', 'technologies'));    }
 
     /**
      * Update the specified resource in storage.
@@ -106,6 +115,13 @@ class ProjectController extends Controller
             $form_data['cover_image'] = $img_path;
         }
 
+        // GESTIONE RELAZIONE MANY-TO-MANY (PROJECTS, TECHNOLOGY)
+
+        if ($request->has('technologies')){
+
+            $project->technologies()->sync($request->technologies);
+        }        
+
         $project->update($form_data);
 
         return redirect()->route('admin.projects.show', $project);
@@ -119,6 +135,9 @@ class ProjectController extends Controller
      */
     public function destroy(Project $project)
     {
+        // GESTIONE RELAZIONE MANY-TO-MANY (PROJECTS, TECHNOLOGY)
+        $project->technologies()->detach();        
+
         $project->delete();
 
         return redirect()->route('admin.projects.index');
