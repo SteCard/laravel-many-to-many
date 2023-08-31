@@ -29,6 +29,7 @@ class StoreProjectRequest extends FormRequest
             'description' => 'required',
             'date_of_creation' => 'required',
             'cover_image' => 'image',
+            'technologies' => 'required|exists:technologies,id',
         ];
     }
 
@@ -46,6 +47,9 @@ class StoreProjectRequest extends FormRequest
             'date_of_creation.required' => 'La data di creazione è obbligatoria',
 
             'cover_image.image' => 'Il file inserito deve essere un\'immagine!',
+
+            'technologies.required' => 'Devi selezionare almeno una Tecnologia',
+            'technologies.exists' => 'Tecnologia selezionata non valida',
         ];
     }
 }
